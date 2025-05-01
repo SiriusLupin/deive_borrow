@@ -38,28 +38,15 @@ except Exception as e:
 # 分頁設計
 tabs = st.tabs(["狀態檢測", "設備借用", "設備歸還", "查詢借用狀態"])
 
-# 狀態檢測
-with tabs[0]:
-    st.subheader("🔎 系統狀態檢查")
-    if "gcp_service_account" not in st.secrets:
-        st.error("❌ st.secrets 中找不到 gcp_service_account")
-    else:
-        st.success("✅ 成功載入 gcp_service_account")
-        st.code(st.secrets["gcp_service_account"].get("client_email", "未找到 Email"))
 
-    st.subheader("🔑 Google Sheets API 初始化")
-    if sheet_ready:
-        st.success("✅ 成功連線 Google Sheets 並取得工作表")
-    else:
-        st.error(f"❌ Google Sheets 初始化失敗：{sheet_error}")
 
 # 設備借用
-with tabs[1]:
+with tabs[0]:
     st.subheader("📥 設備借用")
-    name = st.text_input("借用人姓名")
-    user_purpose = st.selectbox("選擇用途", list(建議設備.keys()))
+    name = st.text_input("借用人姓名", key="borrow_name")
+    user_purpose = st.selectbox("選擇用途", list(建議設備.keys()), key="borrow_purpose")
     st.caption(f"💡 {user_purpose}：{建議設備[user_purpose]}")
-    device_id = st.text_input("請輸入設備編號")
+    device_id = st.text_input("請輸入設備編號", key="borrow_device")
 
     if st.button("借用") and sheet_ready:
         if not name or not device_id:
@@ -81,9 +68,9 @@ with tabs[1]:
                     st.error(f"❌ 借用紀錄寫入失敗：{e}")
 
 # 設備歸還
-with tabs[2]:
+with tabs[1]:
     st.subheader("📤 設備歸還")
-    device_id = st.text_input("請輸入設備編號")
+    device_id = st.text_input("請輸入設備編號", key="return_device")
 
     if st.button("歸還") and sheet_ready:
         if not device_id:
@@ -106,7 +93,7 @@ with tabs[2]:
                 st.error(f"❌ 歸還過程錯誤：{e}")
 
 # 查詢借用狀態
-with tabs[3]:
+with tabs[2]:
     st.subheader("🔍 查詢目前借出狀態")
     if sheet_ready:
         try:
@@ -128,3 +115,18 @@ with tabs[3]:
                 st.info("📭 目前無設備借出中")
         except Exception as e:
             st.error(f"❌ 查詢錯誤：{e}")
+
+# 狀態檢測
+with tabs[3]:
+    st.subheader("🔎 系統狀態檢查")
+    if "gcp_service_account" not in st.secrets:
+        st.error("❌ st.secrets 中找不到 gcp_service_account")
+    else:
+        st.success("✅ 成功載入 gcp_service_account")
+        st.code(st.secrets["gcp_service_account"].get("client_email", "未找到 Email"))
+
+    st.subheader("🔑 Google Sheets API 初始化")
+    if sheet_ready:
+        st.success("✅ 成功連線 Google Sheets 並取得工作表")
+    else:
+        st.error(f"❌ Google Sheets 初始化失敗：{sheet_error}")
