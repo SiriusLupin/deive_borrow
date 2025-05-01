@@ -4,6 +4,14 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 import json
 
+st.subheader("🔑 Secrets 測試")
+
+if "gcp_service_account" not in st.secrets:
+    st.error("❌ st.secrets 中找不到 gcp_service_account")
+else:
+    st.success("✅ 成功載入 gcp_service_account")
+    st.code(st.secrets["gcp_service_account"]["client_email"])
+
 st.subheader("🔑 Google Sheets API 初始化")
 
 try:
