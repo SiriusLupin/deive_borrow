@@ -1,4 +1,6 @@
 import streamlit as st
+st.set_page_config(page_title="設備借用系統", layout="centered")
+
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
@@ -6,8 +8,6 @@ from datetime import datetime
 # ========== 狀態檢測分頁 ==========
 with st.sidebar:
     selected_tab = st.radio("\U0001F5FA️ 功能選單", ["狀態檢測", "設備借用", "設備歸還", "查詢借用狀態"], index=1)
-
-st.set_page_config(page_title="設備借用系統", layout="centered")
 
 st.title("\U0001F4E6 設備借用管理系統")
 
@@ -32,7 +32,7 @@ if selected_tab == "狀態檢測":
         st.error(f"❌ Google Sheets 初始化失敗：{e}")
 
 # ========== 設備用途設定 ==========
-用途對照 = {
+專用用途對照 = {
     'NB04': '院內網路連線',
     'NB07': '院內網路連線',
     'NB11': '院內網路連線',
@@ -51,13 +51,19 @@ if selected_tab == "設備借用":
         if not name or not device_id:
             st.error("⚠️ 請填寫完整資料")
         else:
-            actual_purpose = 用途對照.get(device_id.upper(), "一般用途")
-            if actual_purpose != user_purpose and actual_purpose != "一般用途":
-                st.warning(f"⚠️ {device_id} 為 {actual_purpose} 專用，不能用於 {user_purpose}")
+            device_key = device_id.upper()
+            專用用途 = 專用用途對照.get(device_key, None)
+
+            # 判斷是否為 OBS 專用機（不能用在任何其他用途）
+            if device_key == 'NB12' and user_purpose != 'OBS直播':
+                st.warning(f"⚠️ {device_key} 為 OBS直播 專用，不能用於 {user_purpose}")
+            # 若用途為特定用途（非一般），但設備不是對應那個用途
+            elif user_purpose != "一般用途" and 專用用途 != user_purpose:
+                st.warning(f"⚠️ {device_key} 不支援 {user_purpose}，請選擇對應設備")
             else:
                 try:
                     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    sheet.append_row([now, name, user_purpose, device_id.upper(), "借出", ""])
+                    sheet.append_row([now, name, user_purpose, device_key, "借出", ""])
                     st.success("✅ 借用成功並寫入 Google Sheets")
                 except Exception as e:
                     st.error(f"❌ 借用紀錄寫入失敗：{e}")
