@@ -2,6 +2,7 @@ import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
+import json
 
 st.subheader("🔑 Google Sheets API 初始化")
 
@@ -11,9 +12,12 @@ try:
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 
 # 2. 載入你下載的 JSON 金鑰檔
-    creds = ServiceAccountCredentials.from_json_keyfile_name('vghtpedevicerent-727565953153.json', scope)
+    # 將 st.secrets 的內容轉為 dict 給 gspread 使用
+    gcp_secrets = dict(st.secrets["gcp_service_account"])
 
-# 3. 建立 gspread 客戶端
+    # 重新授權 gspread
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(gcp_secrets, scope)
+   # 3. 建立 gspread 客戶端
     client = gspread.authorize(creds)
 
 # 4. 打開試算表（名稱要與你建立的試算表一致）
