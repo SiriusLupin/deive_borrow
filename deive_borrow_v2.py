@@ -40,14 +40,14 @@ tabs = st.tabs(["設備借用", "設備歸還", "查詢借用狀態","狀態檢�
 
 # 設備借用
 
-    # 從網址讀取 device_types 參數
-    device_types_list = ["筆電", "iPAD", "視訊會議喇叭", "網美燈", "相機", "攝影機", "單槍投影機", "視訊鏡頭", "耳麥"]
-    if "device_type" not in st.session_state:
-        query_type = st.query_params.get("device_types", None)
-        if query_type in device_types_list:
-            st.session_state.device_type = query_type
-        else:
-            st.session_state.device_type = "筆電"
+# 從網址讀取 device_types 參數
+device_types_list = ["筆電", "iPAD", "視訊會議喇叭", "網美燈", "相機", "攝影機", "單槍投影機", "視訊鏡頭", "耳麥"]
+if "device_type" not in st.session_state:
+    query_type = st.query_params.get("device_types", None)
+    if query_type in device_types_list:
+        st.session_state.device_type = query_type
+    else:
+        st.session_state.device_type = "筆電"
 with tabs[0]:
     st.subheader("📥 設備借用")
 
