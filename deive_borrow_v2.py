@@ -71,23 +71,18 @@ with tabs[0]:
     # 已搬移至上方 device_types_list
     device_type = st.selectbox("設備種類", device_types_list, key="device_type")
 
-    說明 = 建議設備.get(device_type, {}).get(user_purpose, "")
-    if 說明:
-        st.caption(f"💡 {user_purpose}：{說明}")
-
-    
-    #if device_type == "筆電":
-    #    purposes = list(建議設備.keys())
-    #elif device_type == "iPAD":
-    #    purposes = ["會議用(含視訊會議)", "評鑑用","其他(請於備註說明)"]
-    #else:
-    #    purposes = ["一般用途", "持續教育用", "其他(請於備註說明)"]
+    if device_type == "筆電":
+        purposes = list(建議設備.keys())
+    elif device_type == "iPAD":
+        purposes = ["會議用(含視訊會議)", "評鑑用","其他(請於備註說明)"]
+    else:
+        purposes = ["一般用途", "持續教育用", "其他(請於備註說明)"]
 
     
     expected_duration = st.selectbox("預計借用時間", ["3天內", "3-7天", "7天以上"], key="borrow_duration")
     name = st.text_input("借用人姓名", key="borrow_name")
     user_purpose = st.selectbox("選擇用途", purposes, key="borrow_purpose")
-    說明 = 建議設備.get(user_purpose, "") if device_type == "筆電" else ""
+    說明 = 建議設備.get(device_type, {}).get(user_purpose, "")
     if 說明:
         st.caption(f"💡 {user_purpose}：{說明}")
     device_id = st.text_input("請輸入設備編號", key="borrow_device")
