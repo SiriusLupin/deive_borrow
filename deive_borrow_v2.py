@@ -48,20 +48,19 @@ with tabs[0]:
     if device_type == "筆電":
         purposes = list(建議設備.keys())
     elif device_type == "iPAD":
-        purposes = ["一般用途", "視訊會議用", "評鑑用"]
+        purposes = ["會議用(含視訊會議)", "評鑑用", "其他(請於備註說明)"]
     else:
-        purposes = ["一般用途", "持續教育用", "其他"]
+        purposes = ["一般用途", "持續教育用", "其他(請於備註說明)"]
 
     
     expected_duration = st.selectbox("預計借用時間", ["3天內", "3-7天", "7天以上"], key="borrow_duration")
-    note = st.text_input("備註 (選填)", key="borrow_note")
     name = st.text_input("借用人姓名", key="borrow_name")
     user_purpose = st.selectbox("選擇用途", purposes, key="borrow_purpose")
     說明 = 建議設備.get(user_purpose, "") if device_type == "筆電" else ""
     if 說明:
         st.caption(f"💡 {user_purpose}：{說明}")
     device_id = st.text_input("請輸入設備編號", key="borrow_device")
-
+    note = st.text_input("備註 (選填)", key="borrow_note")
     if st.button("借用") and sheet_ready:
         if not name or not device_id:
             st.error("⚠️ 請填寫完整資料")
