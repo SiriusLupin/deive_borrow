@@ -71,7 +71,7 @@ with tabs[0]:
     # 已搬移至上方 device_types_list
     device_type = st.selectbox("設備種類", device_types_list, key="device_type")
 
-    說明 = 建議用途說明.get(device_type, {}).get(user_purpose, "")
+    說明 = 建議設備.get(device_type, {}).get(user_purpose, "")
     if 說明:
         st.caption(f"💡 {user_purpose}：{說明}")
 
