@@ -52,23 +52,9 @@ with tabs[0]:
     else:
         purposes = ["一般用途", "持續教育用", "其他"]
 
-    name = st.text_input("借用人姓名", key="borrow_name")
-    user_purpose = st.selectbox("選擇用途", purposes, key="borrow_purpose")
-
-    if device_type == "筆電":
-        st.caption(f"💡 {user_purpose}：{建議設備.get(user_purpose, '可自由使用')}" )
-    elif device_type == "iPAD":
-        st.caption(f"💡 iPAD用途：{user_purpose}")
-    else:
-        st.caption("💡 適用於教學、活動或其他臨時性借用")
-
-    if user_purpose == "其他":
-        other_explanation = st.text_input("請說明其他用途", key="other_purpose_note")
-    else:
-        other_explanation = ""
-
-    device_id = st.text_input("請輸入設備編號", key="borrow_device")
-    note = st.text_input("備註 (選填)", key="borrow_note")
+    
+    expected_duration = st.selectbox("預計借用時間", ["3天內", "3-7天", "7天以上"], key="borrow_duration")
+note = st.text_input("備註 (選填)", key="borrow_note")
     name = st.text_input("借用人姓名", key="borrow_name")
     user_purpose = st.selectbox("選擇用途", list(建議設備.keys()), key="borrow_purpose")
     st.caption(f"💡 {user_purpose}：{建議設備[user_purpose]}")
@@ -88,7 +74,7 @@ with tabs[0]:
             else:
                 try:
                     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    sheet.append_row([now, name, device_type, user_purpose if user_purpose != "其他" else other_explanation, device_key, "借出", note])
+                    sheet.append_row([now, name, device_type, user_purpose if user_purpose != "其他" else other_explanation, device_key, "借出", expected_duration, note])
                     st.success("✅ 借用成功並寫入 Google Sheets")
                 except Exception as e:
                     st.error(f"❌ 借用紀錄寫入失敗：{e}")
@@ -129,12 +115,28 @@ with tabs[2]:
             for row in all_records[1:]:
                 if row[5] == "借出":
                     record = {
-                        "借用人": row[1],
-                        "用途": row[3],
-                        "設備": row[4],
-                        "借出時間": row[0],
-                        "備註": row[6] if len(row) > 6 else ""
-                    }
+                    "借用人": row[1],
+                    "用途": row[3],
+                    "設備": row[4],
+                    "借出時間": row[0],
+                    "預計時長": row[6] if len(row) > 6 else "未填寫",
+                    "備註": row[7] if len(row) > 7 else ""
+                }
+                # 逾期判定
+                try:
+                    借出時間 = datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S")
+                    預計 = row[6] if len(row) > 6 else ""
+                    if 預計 == "3天內":
+                        到期日 = 借出時間 + timedelta(days=3)
+                    elif 預計 == "3-7天":
+                        到期日 = 借出時間 + timedelta(days=7)
+                    elif 預計 == "7天以上":
+                        到期日 = 借出時間 + timedelta(days=14)
+                    else:
+                        到期日 = 借出時間 + timedelta(days=7)
+                    record["逾期"] = "⚠️ 已逾期" if datetime.now() > 到期日 else ""
+                except:
+                    record["逾期"] = ""
                     kind = row[2]
                     if kind not in categories:
                         categories[kind] = []
