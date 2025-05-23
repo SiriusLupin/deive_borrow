@@ -52,7 +52,7 @@ with tabs[0]:
     st.subheader("📥 設備借用")
 
     # 已搬移至上方 device_types_list
-    device_type = st.selectbox("設備種類", device_types_list, index=device_types_list.index(st.session_state.device_type), key="device_type")
+    device_type = st.selectbox("設備種類", device_types_list, key="device_type")
 
     if device_type == "筆電":
         purposes = list(建議設備.keys())
