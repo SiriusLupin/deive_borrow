@@ -54,7 +54,7 @@ with tabs[0]:
 
     
     expected_duration = st.selectbox("預計借用時間", ["3天內", "3-7天", "7天以上"], key="borrow_duration")
-note = st.text_input("備註 (選填)", key="borrow_note")
+    note = st.text_input("備註 (選填)", key="borrow_note")
     name = st.text_input("借用人姓名", key="borrow_name")
     user_purpose = st.selectbox("選擇用途", list(建議設備.keys()), key="borrow_purpose")
     st.caption(f"💡 {user_purpose}：{建議設備[user_purpose]}")
