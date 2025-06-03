@@ -68,25 +68,24 @@ if "device_type" not in st.session_state:
 with tabs[0]:
     st.subheader("📥 設備借用")
 
-    # 已搬移至上方 device_types_list
     device_type = st.selectbox("設備種類", device_types_list, key="device_type")
 
-    if device_type == "筆電":
-        purposes = list(建議設備.keys())
-    elif device_type == "iPAD":
-        purposes = ["會議用(含視訊會議)", "評鑑用","其他(請於備註說明)"]
+    if device_type in 建議設備:
+        purposes = list(建議設備[device_type].keys())
     else:
-        purposes = ["一般用途", "持續教育用", "其他(請於備註說明)"]
+        purposes = ["一般用途"]
 
-    
     expected_duration = st.selectbox("預計借用時間", ["3天內", "3-7天", "7天以上"], key="borrow_duration")
     name = st.text_input("借用人姓名", key="borrow_name")
     user_purpose = st.selectbox("選擇用途", purposes, key="borrow_purpose")
+    
     說明 = 建議設備.get(device_type, {}).get(user_purpose, "")
     if 說明:
         st.caption(f"💡 {user_purpose}：{說明}")
+        
     device_id = st.text_input("請輸入設備編號", key="borrow_device")
     note = st.text_input("備註 (選填)", key="borrow_note")
+
     if st.button("借用") and sheet_ready:
         if not name or not device_id:
             st.error("⚠️ 請填寫完整資料")
@@ -101,10 +100,11 @@ with tabs[0]:
             else:
                 try:
                     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    sheet.append_row([now, name, device_type, user_purpose if user_purpose != "其他" else other_explanation, device_key, "借出", expected_duration, note])
+                    sheet.append_row([now, name, device_type, user_purpose, device_key, "借出", expected_duration, note])
                     st.success("✅ 借用成功並寫入 Google Sheets")
                 except Exception as e:
                     st.error(f"❌ 借用紀錄寫入失敗：{e}")
+
 
 # 設備歸還
 with tabs[1]:
